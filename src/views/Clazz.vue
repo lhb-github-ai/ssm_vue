@@ -9,16 +9,20 @@
       <el-table-column
         prop="id"
         label="编号"
-        width="300">
+        width="260">
       </el-table-column>
       <el-table-column
-        prop="Clazzname"
-        label="用户名"
-        width="300">
+        prop="name"
+        label="班级名称"
+        width="260">
       </el-table-column>
       <el-table-column
-        prop="password"
-        label="密码" width="400">
+        prop="gradeName"
+        label="学院名称" width="260">
+      </el-table-column>
+      <el-table-column
+        prop="remark"
+        label="备注" width="260">
       </el-table-column>
       <el-table-column
       >
@@ -63,11 +67,21 @@
       width="30%"
       :before-close="handleClose">
       <el-form ref="form" :model="addFrom" label-width="80px" size="mini">
-        <el-form-item label="用户名">
-          <el-input v-model="addFrom.Clazzname"></el-input>
+        <el-form-item label="班级名称">
+          <el-input v-model="addFrom.name"></el-input>
         </el-form-item>
-        <el-form-item label="密码">
-          <el-input v-model="addFrom.password"></el-input>
+        <el-form-item label="学院">
+          <el-select v-model="addFrom.gradeId" clearable placeholder="请选择" style="width: 340px">
+            <el-option
+              v-for="item in college"
+              :key="item.gradeId"
+              :label="item.name"
+              :value="item.id">
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="备注">
+          <el-input v-model="addFrom.remark"></el-input>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
@@ -86,11 +100,21 @@
         <el-form-item label="id"  prop="id">
           <el-input v-model="editFrom.id" readonly></el-input>
         </el-form-item>
-        <el-form-item label="用户名" prop="name">
-          <el-input v-model="editFrom.Clazzname"></el-input>
+        <el-form-item label="班级名称" prop="name">
+          <el-input v-model="editFrom.name"></el-input>
         </el-form-item>
-        <el-form-item label="密码" prop="remark" >
-          <el-input v-model="editFrom.password"></el-input>
+        <el-form-item label="学院名称" prop="gradeName" >
+          <el-select v-model="editFrom.gradeName" clearable placeholder="请选择" style="width: 340px">
+            <el-option
+              v-for="item in college"
+              :key="item.gradeName"
+              :label="item.name"
+              :value="item.name">
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="备注" prop="remark" >
+          <el-input v-model="editFrom.remark"></el-input>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
@@ -104,27 +128,34 @@
 
 <script>
 
-  import { findAll, save,deleteClazz,update } from '@/api/Clazz'
-
+  import { findAll, save,deleteClazz,update,findAllCollege } from '@/api/Clazz'
   export default {
     name: 'Clazz',
     data () {
       return {
+        college: [{
+          id: '选项1',
+          name: '黄金糕',
+        }, {
+          id: '选项2',
+          name: '双皮奶',
+        }],
+        value:'',
         dialogEdit:false,
         dialogVisible: false,
         Clazz: [{
-          id: '2016-05-02',
-          Clazzname: '王小虎',
-          password: '上海市普陀区金沙江路 1518 弄',
+          id: '2',
+          name:'123',
+          gradeName: '312312',
+          gradeId:'2',
+          remark: '3213123',
         }, {
-          id: '2016-05-02',
-          Clazzname: '王小虎',
-          password: '上海市普陀区金沙江路 1518 弄',
-        }, {
-          id: '2016-05-02',
-          Clazzname: '王小虎',
-          password: '上海市普陀区金沙江路 1518 弄',
-        },],
+          id: '2',
+          name:'123',
+          gradeName: '312312',
+          gradeId:'2',
+          remark: '3213123',
+        }],
         loading: '',
         search: '',
         page:1,
@@ -132,9 +163,10 @@
         totals:0,
         addFrom: {},
         editFrom:{
-          id:'1',
-          Clazzname:'张三',
-          password:'ddadds'
+          gradeId:'2',
+          name:'张三',
+          gradeName: '312312',
+          remark: '3213123',
         }
 
       }
@@ -228,10 +260,13 @@
         this.dialogEdit=true;
         // console.log(row)
         this.editFrom.id=row.id
-        this.editFrom.Clazzname=row.Clazzname
-        this.editFrom.password=row.password
+        this.editFrom.name=row.name
+        this.editFrom.gradeName=row.gradeName
+        this.editFrom.remark=row.remark
+        this.gradeId=row.gradeId;
       },
       editClazz2(){
+        console.log(this.editFrom)
         this.$confirm('确认提交吗？')
           .then(_ => {
             update(this.editFrom).then(res => {
@@ -258,6 +293,9 @@
     },
     created () {
       this.findAllByPage()
+      findAllCollege().then(res=>{
+          this.college=res.data.list;
+      })
     }
   }
 </script>
