@@ -5,6 +5,8 @@
     <el-table
       :data="Clazz"
       style="width: 100%"
+      highlight-current-row v-loading="loading"
+      border element-loading-text="拼命加载中"
       :row-class-name="tableRowClassName">
       <el-table-column
         prop="id"
@@ -58,7 +60,6 @@
         </el-pagination>
       </el-col>
     </el-row>
-
 
     <!--新增-->
     <el-dialog
@@ -128,176 +129,177 @@
 
 <script>
 
-  import { findAll, save,deleteClazz,update,findAllCollege } from '@/api/Clazz'
-  export default {
-    name: 'Clazz',
-    data () {
-      return {
-        college: [{
-          id: '选项1',
-          name: '黄金糕',
-        }, {
-          id: '选项2',
-          name: '双皮奶',
-        }],
-        value:'',
-        dialogEdit:false,
-        dialogVisible: false,
-        Clazz: [{
-          id: '2',
-          name:'123',
-          gradeName: '312312',
-          gradeId:'2',
-          remark: '3213123',
-        }, {
-          id: '2',
-          name:'123',
-          gradeName: '312312',
-          gradeId:'2',
-          remark: '3213123',
-        }],
-        loading: '',
-        search: '',
-        page:1,
-        size:4,
-        totals:0,
-        addFrom: {},
-        editFrom:{
-          gradeId:'2',
-          name:'张三',
-          gradeName: '312312',
-          remark: '3213123',
-        }
-
+import { findAll, save, deleteClazz, update, findAllCollege } from '@/api/Clazz'
+export default {
+  name: 'Clazz',
+  data () {
+    return {
+      $loading:false,
+      college: [{
+        id: '选项1',
+        name: '黄金糕'
+      }, {
+        id: '选项2',
+        name: '双皮奶'
+      }],
+      value: '',
+      dialogEdit: false,
+      dialogVisible: false,
+      Clazz: [{
+        id: '2',
+        name: '123',
+        gradeName: '312312',
+        gradeId: '2',
+        remark: '3213123'
+      }, {
+        id: '2',
+        name: '123',
+        gradeName: '312312',
+        gradeId: '2',
+        remark: '3213123'
+      }],
+      loading: '',
+      search: '',
+      page: 1,
+      size: 4,
+      totals: 0,
+      addFrom: {},
+      editFrom: {
+        gradeId: '2',
+        name: '张三',
+        gradeName: '312312',
+        remark: '3213123'
       }
-    },
-    methods: {
-      handleSizeChange(size){
-        this.size = size;
-        this.findAllByPage(this.page,size);
-      },
-      findPage(page) {
-        this.page = page;
-        this.findAllByPage(page,this.size);
-      },
-      findAllByPage () {
-        findAll(this.page,this.size).then(res => {
-          // this.Clazz=res.li
-          this.Clazz = res.data.list
-          // console.log(res.data.list)
-          this.total=res.data.total;
-          this.page=res.data.pageNum;
-          this.size=res.data.pageSize;
-          this.totals=res.data.total;
-        })
-      },
-      tableRowClassName ({ row, rowIndex }) {
-        if (rowIndex === 1) {
-          return 'warning-row'
-        } else if (rowIndex === 3) {
-          return 'success-row'
-        }
-        return ''
-      },
-      handleClose (done) {
-        this.$confirm('确认关闭？')
-          .then(_ => {
-            done()
-          })
-          .catch(_ => {
-          })
-      },
-      addClazz () {
-        // console.log(this.addFrom);
-        this.$confirm('确认提交吗？')
-          .then(_ => {
-            save(this.addFrom).then(res => {
-              console.log(res.data)
-              if (res.data.type=="success"){
-                this.$message({
-                  message: "添加成功",
-                  type: "success"
-                });
-                this.dialogVisible=false;
-                this.findAllByPage();
-                this.addFrom.Clazzname="";
-                this.addFrom.password="";
-              }else {
-                this.$message({
-                  message: "提交失败",
-                  type: "error"
-                });
-              }
-            })
 
-          })
-          .catch(_ => {
-          })
-      },
-      deleteClazz(row){
-        // console.log(row.id)
-        this.$confirm('确认删除？')
-          .then(_ => {
-            deleteClazz(row.id).then(res=>{
-              if (res.data.type=="success"){
-                this.$message({
-                  message: "删除成功",
-                  type: "success"
-                });
-                this.findAllByPage();
-              }else {
-                this.$message({
-                  message: "删除失败",
-                  type: "error"
-                });
-              }
-            })
-              .catch(_ => {
-              })
-          })
-      },
-      editClazz(row){
-        this.dialogEdit=true;
-        // console.log(row)
-        this.editFrom.id=row.id
-        this.editFrom.name=row.name
-        this.editFrom.gradeName=row.gradeName
-        this.editFrom.remark=row.remark
-        this.gradeId=row.gradeId;
-      },
-      editClazz2(){
-        console.log(this.editFrom)
-        this.$confirm('确认提交吗？')
-          .then(_ => {
-            update(this.editFrom).then(res => {
-              // console.log(res.data)
-              if (res.data.type=="success"){
-                this.$message({
-                  message: "修改成功",
-                  type: "success"
-                });
-                this.dialogEdit=false;
-                this.findAllByPage();
-              }else {
-                this.$message({
-                  message: "提交失败",
-                  type: "error"
-                });
-              }
-            })
-
-          })
-          .catch(_ => {
-          })
-      }
-    },
-    created () {
-      this.findAllByPage()
-      findAllCollege().then(res=>{
-          this.college=res.data.list;
-      })
     }
+  },
+  methods: {
+    handleSizeChange (size) {
+      this.size = size
+      this.findAllByPage(this.page, size)
+    },
+    findPage (page) {
+      this.page = page
+      this.findAllByPage(page, this.size)
+    },
+    findAllByPage () {
+      this.loading=true;
+      findAll(this.page, this.size).then(res => {
+        // this.Clazz=res.li
+        this.loading=false
+        this.Clazz = res.data.list
+        // console.log(res.data.list)
+        this.total = res.data.total
+        this.page = res.data.pageNum
+        this.size = res.data.pageSize
+        this.totals = res.data.total
+      })
+    },
+    tableRowClassName ({ row, rowIndex }) {
+      if (rowIndex === 1) {
+        return 'warning-row'
+      } else if (rowIndex === 3) {
+        return 'success-row'
+      }
+      return ''
+    },
+    handleClose (done) {
+      this.$confirm('确认关闭？')
+        .then(_ => {
+          done()
+        })
+        .catch(_ => {
+        })
+    },
+    addClazz () {
+      // console.log(this.addFrom);
+      this.$confirm('确认提交吗？')
+        .then(_ => {
+          save(this.addFrom).then(res => {
+            console.log(res.data)
+            if (res.data.type == 'success') {
+              this.$message({
+                message: '添加成功',
+                type: 'success'
+              })
+              this.dialogVisible = false
+              this.findAllByPage()
+              this.addFrom.Clazzname = ''
+              this.addFrom.password = ''
+            } else {
+              this.$message({
+                message: '提交失败',
+                type: 'error'
+              })
+            }
+          })
+        })
+        .catch(_ => {
+        })
+    },
+    deleteClazz (row) {
+      // console.log(row.id)
+      this.$confirm('确认删除？')
+        .then(_ => {
+          deleteClazz(row.id).then(res => {
+            if (res.data.type == 'success') {
+              this.$message({
+                message: '删除成功',
+                type: 'success'
+              })
+              this.findAllByPage()
+            } else {
+              this.$message({
+                message: '删除失败',
+                type: 'error'
+              })
+            }
+          })
+            .catch(_ => {
+            })
+        })
+    },
+    editClazz (row) {
+      this.dialogEdit = true
+      // console.log(row)
+      this.editFrom.id = row.id
+      this.editFrom.name = row.name
+      this.editFrom.gradeName = row.gradeName
+      this.editFrom.remark = row.remark
+      this.gradeId = row.gradeId
+    },
+    editClazz2 () {
+      console.log(this.editFrom)
+      this.$confirm('确认提交吗？')
+        .then(_ => {
+          update(this.editFrom).then(res => {
+            // console.log(res.data)
+            if (res.data.type == 'success') {
+              this.$message({
+                message: '修改成功',
+                type: 'success'
+              })
+              this.dialogEdit = false
+              this.findAllByPage()
+            } else {
+              this.$message({
+                message: '提交失败',
+                type: 'error'
+              })
+            }
+          })
+        })
+        .catch(_ => {
+        })
+    }
+  },
+  created () {
+    this.findAllByPage()
+    findAllCollege().then(res => {
+      this.college = res.data.list
+    })
   }
+}
 </script>
 
 <style scoped>

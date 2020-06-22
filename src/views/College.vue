@@ -5,6 +5,8 @@
     <el-table
       :data="college"
       style="width: 100%"
+      highlight-current-row v-loading="loading"
+      border element-loading-text="拼命加载中"
       :row-class-name="tableRowClassName">
       <el-table-column
         prop="id"
@@ -55,7 +57,6 @@
       </el-col>
     </el-row>
 
-
 <!--新增-->
     <el-dialog
       title="提示"
@@ -104,160 +105,160 @@
 
 <script>
 
-  import { findAll, save,deleteCollege,update } from '@/api/College'
+import { findAll, save, deleteCollege, update } from '@/api/College'
 
-  export default {
-    name: 'User',
-    data () {
-      return {
-        dialogEdit:false,
-        dialogVisible: false,
-        college: [{
-          id: '2016-05-02',
-          name: '王小虎',
-          remark: '上海市普陀区金沙江路 1518 弄',
-        }, {
-          id: '2016-05-02',
-          name: '王小虎',
-          remark: '上海市普陀区金沙江路 1518 弄',
-        }, {
-          id: '2016-05-02',
-          name: '王小虎',
-          remark: '上海市普陀区金沙江路 1518 弄',
-        },],
-        loading: '',
-        search: '',
-        page:1,
-        size:4,
-        totals:0,
-        addFrom: {},
-        editFrom:{
-          id:'1',
-          name:'张三',
-          remark:'ddadds'
-        }
-
+export default {
+  name: 'User',
+  data () {
+    return {
+      dialogEdit: false,
+      dialogVisible: false,
+      college: [{
+        id: '2016-05-02',
+        name: '王小虎',
+        remark: '上海市普陀区金沙江路 1518 弄'
+      }, {
+        id: '2016-05-02',
+        name: '王小虎',
+        remark: '上海市普陀区金沙江路 1518 弄'
+      }, {
+        id: '2016-05-02',
+        name: '王小虎',
+        remark: '上海市普陀区金沙江路 1518 弄'
+      }],
+      loading: false,
+      search: '',
+      page: 1,
+      size: 4,
+      totals: 0,
+      addFrom: {},
+      editFrom: {
+        id: '1',
+        name: '张三',
+        remark: 'ddadds'
       }
-    },
-    methods: {
-      handleSizeChange(size){
-        this.size = size;
-        this.findAllByPage(this.page,size);
-      },
-      findPage(page) {
-        this.page = page;
-        this.findAllByPage(page,this.size);
-      },
-      findAllByPage () {
-        findAll(this.page,this.size).then(res => {
-          // this.college=res.li
-          this.college = res.data.list
-          // console.log(res.data.list)
-          this.total=res.data.total;
-          this.page=res.data.pageNum;
-          this.size=res.data.pageSize;
-          this.totals=res.data.total;
-        })
-      },
-      tableRowClassName ({ row, rowIndex }) {
-        if (rowIndex === 1) {
-          return 'warning-row'
-        } else if (rowIndex === 3) {
-          return 'success-row'
-        }
-        return ''
-      },
-      handleClose (done) {
-        this.$confirm('确认关闭？')
-          .then(_ => {
-            done()
-          })
-          .catch(_ => {
-          })
-      },
-      addCollege () {
-        // console.log(this.addFrom);
-        this.$confirm('确认提交吗？')
-          .then(_ => {
-            save(this.addFrom).then(res => {
-              console.log(res.data)
-              if (res.data.type=="success"){
-                this.$message({
-                  message: "添加成功",
-                  type: "success"
-                });
-                 this.dialogVisible=false;
-                 this.findAllByPage();
-              }else {
-                this.$message({
-                  message: "提交失败",
-                  type: "error"
-                });
-              }
-            })
 
+    }
+  },
+  methods: {
+    handleSizeChange (size) {
+      this.size = size
+      this.findAllByPage(this.page, size)
+    },
+    findPage (page) {
+      this.page = page
+      this.findAllByPage(page, this.size)
+    },
+    findAllByPage () {
+      this.loading=true
+      findAll(this.page, this.size).then(res => {
+        // this.college=res.li
+        this.loading=false
+        this.college = res.data.list
+        // console.log(res.data.list)
+        this.total = res.data.total
+        this.page = res.data.pageNum
+        this.size = res.data.pageSize
+        this.totals = res.data.total
+      })
+    },
+    tableRowClassName ({ row, rowIndex }) {
+      if (rowIndex === 1) {
+        return 'warning-row'
+      } else if (rowIndex === 3) {
+        return 'success-row'
+      }
+      return ''
+    },
+    handleClose (done) {
+      this.$confirm('确认关闭？')
+        .then(_ => {
+          done()
+        })
+        .catch(_ => {
+        })
+    },
+    addCollege () {
+      // console.log(this.addFrom);
+      this.$confirm('确认提交吗？')
+        .then(_ => {
+          save(this.addFrom).then(res => {
+            console.log(res.data)
+            if (res.data.type == 'success') {
+              this.$message({
+                message: '添加成功',
+                type: 'success'
+              })
+              this.dialogVisible = false
+              this.findAllByPage()
+            } else {
+              this.$message({
+                message: '提交失败',
+                type: 'error'
+              })
+            }
           })
-          .catch(_ => {
+        })
+        .catch(_ => {
+        })
+    },
+    deleteCollege (row) {
+      // console.log(row.id)
+      this.$confirm('确认删除？')
+        .then(_ => {
+          deleteCollege(row.id).then(res => {
+            if (res.data.type == 'success') {
+              this.$message({
+                message: '删除成功',
+                type: 'success'
+              })
+              this.findAllByPage()
+            } else {
+              this.$message({
+                message: '删除失败',
+                type: 'error'
+              })
+            }
           })
-      },
-      deleteCollege(row){
-       // console.log(row.id)
-          this.$confirm('确认删除？')
-            .then(_ => {
-              deleteCollege(row.id).then(res=>{
-                if (res.data.type=="success"){
-                  this.$message({
-                    message: "删除成功",
-                    type: "success"
-                  });
-                  this.findAllByPage();
-                }else {
-                  this.$message({
-                    message: "删除失败",
-                    type: "error"
-                  });
-                }
-            })
             .catch(_ => {
             })
         })
-      },
-      editCollege(row){
-        this.dialogEdit=true;
-        // console.log(row)
-        this.editFrom.id=row.id
-        this.editFrom.name=row.name
-        this.editFrom.remark=row.remark
-      },
-      editCollege2(){
-        this.$confirm('确认提交吗？')
-          .then(_ => {
-            update(this.editFrom).then(res => {
-              // console.log(res.data)
-              if (res.data.type=="success"){
-                this.$message({
-                  message: "修改成功",
-                  type: "success"
-                });
-                this.dialogEdit=false;
-                this.findAllByPage();
-              }else {
-                this.$message({
-                  message: "提交失败",
-                  type: "error"
-                });
-              }
-            })
-
-          })
-          .catch(_ => {
-          })
-      }
     },
-    created () {
-      this.findAllByPage()
+    editCollege (row) {
+      this.dialogEdit = true
+      // console.log(row)
+      this.editFrom.id = row.id
+      this.editFrom.name = row.name
+      this.editFrom.remark = row.remark
+    },
+    editCollege2 () {
+      this.$confirm('确认提交吗？')
+        .then(_ => {
+          update(this.editFrom).then(res => {
+            // console.log(res.data)
+            if (res.data.type == 'success') {
+              this.$message({
+                message: '修改成功',
+                type: 'success'
+              })
+              this.dialogEdit = false
+              this.findAllByPage()
+            } else {
+              this.$message({
+                message: '提交失败',
+                type: 'error'
+              })
+            }
+          })
+        })
+        .catch(_ => {
+        })
     }
+  },
+  created () {
+    this.findAllByPage()
   }
+}
 </script>
 
 <style scoped>

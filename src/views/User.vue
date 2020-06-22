@@ -5,6 +5,8 @@
     <el-table
       :data="user"
       style="width: 100%"
+      highlight-current-row v-loading="loading"
+      border element-loading-text="拼命加载中"
       :row-class-name="tableRowClassName">
       <el-table-column
         prop="id"
@@ -13,7 +15,7 @@
       </el-table-column>
       <el-table-column
         prop="username"
-        label="用户名"
+        label="老师姓名"
         width="300">
       </el-table-column>
       <el-table-column
@@ -54,7 +56,6 @@
         </el-pagination>
       </el-col>
     </el-row>
-
 
     <!--新增-->
     <el-dialog
@@ -104,162 +105,162 @@
 
 <script>
 
-  import { findAll, save,deleteUser,update } from '@/api/user'
+import { findAll, save, deleteUser, update } from '@/api/user'
 
-  export default {
-    name: 'User',
-    data () {
-      return {
-        dialogEdit:false,
-        dialogVisible: false,
-        user: [{
-          id: '2016-05-02',
-          username: '王小虎',
-          password: '上海市普陀区金沙江路 1518 弄',
-        }, {
-          id: '2016-05-02',
-          username: '王小虎',
-          password: '上海市普陀区金沙江路 1518 弄',
-        }, {
-          id: '2016-05-02',
-          username: '王小虎',
-          password: '上海市普陀区金沙江路 1518 弄',
-        },],
-        loading: '',
-        search: '',
-        page:1,
-        size:4,
-        totals:0,
-        addFrom: {},
-        editFrom:{
-          id:'1',
-          username:'张三',
-          password:'ddadds'
-        }
-
+export default {
+  name: 'User',
+  data () {
+    return {
+      loading:false,
+      dialogEdit: false,
+      dialogVisible: false,
+      user: [{
+        id: '2016-05-02',
+        username: '王小虎',
+        password: '上海市普陀区金沙江路 1518 弄'
+      }, {
+        id: '2016-05-02',
+        username: '王小虎',
+        password: '上海市普陀区金沙江路 1518 弄'
+      }, {
+        id: '2016-05-02',
+        username: '王小虎',
+        password: '上海市普陀区金沙江路 1518 弄'
+      }],
+      search: '',
+      page: 1,
+      size: 4,
+      totals: 0,
+      addFrom: {},
+      editFrom: {
+        id: '1',
+        username: '张三',
+        password: 'ddadds'
       }
-    },
-    methods: {
-      handleSizeChange(size){
-        this.size = size;
-        this.findAllByPage(this.page,size);
-      },
-      findPage(page) {
-        this.page = page;
-        this.findAllByPage(page,this.size);
-      },
-      findAllByPage () {
-        findAll(this.page,this.size).then(res => {
-          // this.User=res.li
-          this.user = res.data.list
-          // console.log(res.data.list)
-          this.total=res.data.total;
-          this.page=res.data.pageNum;
-          this.size=res.data.pageSize;
-          this.totals=res.data.total;
-        })
-      },
-      tableRowClassName ({ row, rowIndex }) {
-        if (rowIndex === 1) {
-          return 'warning-row'
-        } else if (rowIndex === 3) {
-          return 'success-row'
-        }
-        return ''
-      },
-      handleClose (done) {
-        this.$confirm('确认关闭？')
-          .then(_ => {
-            done()
-          })
-          .catch(_ => {
-          })
-      },
-      addUser () {
-        // console.log(this.addFrom);
-        this.$confirm('确认提交吗？')
-          .then(_ => {
-            save(this.addFrom).then(res => {
-              console.log(res.data)
-              if (res.data.type=="success"){
-                this.$message({
-                  message: "添加成功",
-                  type: "success"
-                });
-                this.dialogVisible=false;
-                this.findAllByPage();
-                this.addFrom.username="";
-                this.addFrom.password="";
-              }else {
-                this.$message({
-                  message: "提交失败",
-                  type: "error"
-                });
-              }
-            })
 
-          })
-          .catch(_ => {
-          })
-      },
-      deleteUser(row){
-        // console.log(row.id)
-        this.$confirm('确认删除？')
-          .then(_ => {
-            deleteUser(row.id).then(res=>{
-              if (res.data.type=="success"){
-                this.$message({
-                  message: "删除成功",
-                  type: "success"
-                });
-                this.findAllByPage();
-              }else {
-                this.$message({
-                  message: "删除失败",
-                  type: "error"
-                });
-              }
-            })
-              .catch(_ => {
-              })
-          })
-      },
-      editUser(row){
-        this.dialogEdit=true;
-        // console.log(row)
-        this.editFrom.id=row.id
-        this.editFrom.username=row.username
-        this.editFrom.password=row.password
-      },
-      editUser2(){
-        this.$confirm('确认提交吗？')
-          .then(_ => {
-            update(this.editFrom).then(res => {
-              // console.log(res.data)
-              if (res.data.type=="success"){
-                this.$message({
-                  message: "修改成功",
-                  type: "success"
-                });
-                this.dialogEdit=false;
-                this.findAllByPage();
-              }else {
-                this.$message({
-                  message: "提交失败",
-                  type: "error"
-                });
-              }
-            })
-
-          })
-          .catch(_ => {
-          })
-      }
-    },
-    created () {
-      this.findAllByPage()
     }
+  },
+  methods: {
+    handleSizeChange (size) {
+      this.size = size
+      this.findAllByPage(this.page, size)
+    },
+    findPage (page) {
+      this.page = page
+      this.findAllByPage(page, this.size)
+    },
+    findAllByPage () {
+      findAll(this.page, this.size).then(res => {
+        this.loading=false
+        // this.User=res.li
+        this.user = res.data.list
+        // console.log(res.data.list)
+        this.total = res.data.total
+        this.page = res.data.pageNum
+        this.size = res.data.pageSize
+        this.totals = res.data.total
+      })
+    },
+    tableRowClassName ({ row, rowIndex }) {
+      if (rowIndex === 1) {
+        return 'warning-row'
+      } else if (rowIndex === 3) {
+        return 'success-row'
+      }
+      return ''
+    },
+    handleClose (done) {
+      this.$confirm('确认关闭？')
+        .then(_ => {
+          done()
+        })
+        .catch(_ => {
+        })
+    },
+    addUser () {
+      // console.log(this.addFrom);
+      this.$confirm('确认提交吗？')
+        .then(_ => {
+          save(this.addFrom).then(res => {
+            console.log(res.data)
+            if (res.data.type == 'success') {
+              this.$message({
+                message: '添加成功',
+                type: 'success'
+              })
+              this.dialogVisible = false
+              this.findAllByPage()
+              this.addFrom.username = ''
+              this.addFrom.password = ''
+            } else {
+              this.$message({
+                message: '提交失败',
+                type: 'error'
+              })
+            }
+          })
+        })
+        .catch(_ => {
+        })
+    },
+    deleteUser (row) {
+      // console.log(row.id)
+      this.$confirm('确认删除？')
+        .then(_ => {
+          deleteUser(row.id).then(res => {
+            if (res.data.type == 'success') {
+              this.$message({
+                message: '删除成功',
+                type: 'success'
+              })
+              this.findAllByPage()
+            } else {
+              this.$message({
+                message: '删除失败',
+                type: 'error'
+              })
+            }
+          })
+            .catch(_ => {
+            })
+        })
+    },
+    editUser (row) {
+      this.dialogEdit = true
+      // console.log(row)
+      this.editFrom.id = row.id
+      this.editFrom.username = row.username
+      this.editFrom.password = row.password
+    },
+    editUser2 () {
+      this.$confirm('确认提交吗？')
+        .then(_ => {
+          update(this.editFrom).then(res => {
+            // console.log(res.data)
+            if (res.data.type == 'success') {
+              this.$message({
+                message: '修改成功',
+                type: 'success'
+              })
+              this.dialogEdit = false
+              this.findAllByPage()
+            } else {
+              this.$message({
+                message: '提交失败',
+                type: 'error'
+              })
+            }
+          })
+        })
+        .catch(_ => {
+        })
+    }
+  },
+  created () {
+    this.loading=true
+    this.findAllByPage()
   }
+}
 </script>
 
 <style scoped>

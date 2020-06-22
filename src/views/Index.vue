@@ -11,19 +11,20 @@
         <router-view></router-view>
       </el-main>
     </el-container>
+
   </el-container>
 </template>
 
 <script>
-    import Leftnav from "./public/Leftnav";
-    import Topnav from "./public/Topnav";
-    export default {
-        name: "Index",
-      components: {Topnav, Leftnav}
-    }
+import Leftnav from './public/Leftnav'
+import Topnav from './public/Topnav'
+import test from "./test"
+export default {
+  name: 'Index',
+  components: { Topnav, Leftnav,test }
+}
 </script>
 
 <style scoped>
-
 
 </style>

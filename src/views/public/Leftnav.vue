@@ -13,15 +13,16 @@
     style="height: 100%">
     <div class="logobox">
     </div>
+    <div v-if="user.role==='超级管理员'">
     <el-submenu index="1">
       <template slot="title">
         <i class="el-icon-menu"></i>
-        <span>用户管理</span>
+        <span>老师管理</span>
       </template>
       <el-menu-item-group>
         <el-menu-item index="1-1">
        <i class="iconfont icon-user"></i>
-          <router-link to="/User">用户列表</router-link>
+          <router-link to="/User">老师列表</router-link>
         </el-menu-item>
       </el-menu-item-group>
     </el-submenu>
@@ -37,6 +38,7 @@
         </el-menu-item>
       </el-menu-item-group>
     </el-submenu>
+
     <el-submenu index="3">
       <template slot="title">
         <i class="el-icon-menu"></i>
@@ -49,6 +51,8 @@
         </el-menu-item>
       </el-menu-item-group>
     </el-submenu>
+    </div>
+    <div v-if="user.role==name" >
     <el-submenu index="4">
       <template slot="title">
         <i class="el-icon-menu"></i>
@@ -61,22 +65,55 @@
         </el-menu-item>
       </el-menu-item-group>
     </el-submenu>
+    </div>
+
+    <div v-if="user.role==='学生'">
+    <el-submenu index="5">
+      <template slot="title">
+        <i class="el-icon-menu"></i>
+        <span slot="title">个人信息</span>
+      </template>
+      <el-menu-item-group>
+        <el-menu-item index="5-1">
+          <span class="iconfont icon-Student"></span>
+          <router-link to="/Personal">个人信息列表</router-link>
+        </el-menu-item>
+      </el-menu-item-group>
+    </el-submenu>
+    </div>
+
   </el-menu>
 
 </template>
 
 <script>
-    export default {
-        name: "Leftnav",
-      methods: {
-        handleOpen(key, keyPath) {
-
-        },
-        handleClose(key, keyPath) {
-
-        }
-      }
+export default {
+  name: 'Leftnav',
+  data(){
+    return{
+       user:"",
+       name:''
     }
+  },
+  methods: {
+    handleOpen (key, keyPath) {
+
+    },
+    handleClose (key, keyPath) {
+
+    },
+
+  },
+  created: function () {
+    var  user= JSON.parse(sessionStorage.getItem("user"));
+    this.user=user
+  if (user.role==="学生"){
+    this.name="11"
+  }
+  this.name=user.role
+    console.log(user)
+  }
+}
 </script>
 
 <style scoped>

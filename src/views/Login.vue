@@ -28,65 +28,69 @@
 </template>
 
 <script>
-  import {login} from '@/api/user'
-  export default {
-    name: "Login",
-    data() {
-      return {
-        form: {
-          username: '',
-          password: ''
-        },
+import { login,login2 } from '@/api/user'
+export default {
+  name: 'Login',
+  data () {
+    return {
+      form: {
+        username: '',
+        password: ''
+      },
 
-        // 表单验证，需要在 el-form-item 元素中增加 prop 属性
-        rules: {
-          username: [
-            {required: true, message: '账号不可为空', trigger: 'blur'}
-          ],
-          password: [
-            {required: true, message: '密码不可为空', trigger: 'blur'}
-          ]
-        },
+      // 表单验证，需要在 el-form-item 元素中增加 prop 属性
+      rules: {
+        username: [
+          { required: true, message: '账号不可为空', trigger: 'blur' }
+        ],
+        password: [
+          { required: true, message: '密码不可为空', trigger: 'blur' }
+        ]
+      },
 
-        // 对话框显示和隐藏
-        dialogVisible: false
-      }
-    },
-    methods: {
-      onSubmit(formName) {
-        // 为表单绑定验证功能
-        this.$refs[formName].validate((valid) => {
-          if (valid) {
-            // 使用 vue-router 路由到指定页面，该方式称之为编程式导航
-            login(this.form).then(res => {
-              console.log(res)
-              if(res.data=="success"){
-                this.$message({
-                  message: "登录成功",
-                  type: "success"
-                });
-                console.log("success")
-                this.$router.push("/index")
-              }else if(res.data=="fail"){
-                this.$message({
-                  message: "账号或者密码错误",
-                  type: "error"
-                });
-              } else{
-                this.$message({
-                  message: "登录失败",
-                  type: "error"
-                });
-              }
-            })
-          } else {
-            this.dialogVisible = true;
-            return false;
-          }
-        });
-      }
+      // 对话框显示和隐藏
+      dialogVisible: false
+    }
+  },
+  methods: {
+    onSubmit (formName) {
+      // 为表单绑定验证功能
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+          // 使用 vue-router 路由到指定页面，该方式称之为编程式导航
+          login(this.form).then(res => {
+            // console.log(res.data)
+            if (res.data.success == 'success') {
+              this.$message({
+                message: '登录成功',
+                type: 'success'
+              })
+
+              sessionStorage.setItem("user", JSON.stringify(res.data.user));
+
+              this.$router.push('/index')
+
+
+            } else if (res.data.fail == 'fail') {
+              this.$message({
+                message: '账号或者密码错误',
+                type: 'error'
+              })
+            } else {
+              this.$message({
+                message: '登录失败',
+                type: 'error'
+              })
+            }
+          })
+        } else {
+          this.dialogVisible = true
+          return false
+        }
+      })
     }
   }
+}
 </script>
 
 <style lang="scss" scoped>

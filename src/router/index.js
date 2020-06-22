@@ -1,12 +1,13 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import Index from "../views/Index";
-import Login from "../views/Login";
-import User from "../views/User";
-import College from "../views/College";
-import Clazz from "../views/Clazz";
-import Student from "../views/Student";
-
+import Index from '../views/Index'
+import Login from '../views/Login'
+import User from '../views/User'
+import College from '../views/College'
+import Clazz from '../views/Clazz'
+import Student from '../views/Student'
+import test from '../views/test'
+import Personal from '../views/Personal'
 Vue.use(VueRouter)
 
 const routes = [
@@ -15,7 +16,12 @@ const routes = [
     path: '/index',
     name: 'index',
     component: Index,
-    children:[
+    children: [
+      {
+        path: '/',
+        name: 'test',
+        component: test
+      },
       {
         path: '/User',
         name: 'User',
@@ -34,6 +40,12 @@ const routes = [
         name: 'Student',
         component: Student
       },
+
+      {
+        path: '/Personal',
+        name: 'Personal',
+        component: Personal
+      }
     ]
   },
   {
@@ -41,6 +53,16 @@ const routes = [
     name: 'Login',
     component: Login
   },
+  {
+    path: '/login',
+    name: 'Login',
+    component: Login
+  },
+  {
+    path: '/test',
+    name: 'test',
+    component: test
+  }
 ]
 
 const router = new VueRouter({
